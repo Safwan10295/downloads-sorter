@@ -1,0 +1,122 @@
+# Downloads Sorter settings
+#
+# After editing, choose "Reload config" in the tray menu (or restart the app).
+# Test your rules without moving anything:   python -m downloads_sorter explain "Invoice March.pdf"
+#
+# Paths: use forward slashes or single quotes. In double quotes a backslash is
+# an escape character, so "C:\Users\..." will NOT work but 'C:\Users\...' will.
+
+# Folder to watch. "auto" = your Windows Downloads folder (even if you moved it).
+watch_folder: auto
+
+# Where the sorted sub-folders are created. Leave empty to use the watch folder,
+# e.g. Downloads/Images, Downloads/Documents/Finance, ...
+destination:
+
+# true = don't move anything, only write what WOULD happen to the move log.
+dry_run: false
+
+# Windows notification each time something is sorted.
+notifications: true
+
+# true = when the app starts (and when you resume after pausing), also sort
+# everything already sitting in the watch folder, not just new downloads.
+# Undo it with "Undo last bulk sort" in the tray menu.
+sort_existing_on_start: true
+
+# Put files in month folders, e.g. Images/2026-10. This is the default for every
+# rule; a rule can override it with its own "by_month: true/false".
+month_subfolders: false
+month_format: "%Y-%m"
+
+# Where files go when no rule matches. Leave empty to leave them in Downloads.
+fallback_folder: Other
+
+# A file is only moved once its size hasn't changed for this many seconds...
+settle_seconds: 3
+# ...and it hasn't been modified for at least this long.
+min_age_seconds: 5
+
+# Browsers' "still downloading" files. These are never touched, and neither is
+# a file with one of these next to it (e.g. Firefox's report.pdf + report.pdf.part).
+in_progress_extensions: [.crdownload, .part, .partial, .tmp, .download, .opdownload]
+
+# Never moved: shortcuts.
+skip_extensions: [.lnk, .url]
+
+# Never moved: these names (wildcards allowed). Hidden/system files are skipped too.
+ignore_names: [desktop.ini, thumbs.db, "~$*"]
+skip_hidden: true
+
+# ---------------------------------------------------------------------------
+# RULES: checked top to bottom, the FIRST match wins.
+#
+#   name:        a label (shown in logs)
+#   folder:      where matching files go, relative to `destination`
+#                (sub-folders like Documents/Finance are fine)
+#   extensions:  list of file types, with or without the dot
+#   pattern:     a regular expression searched for anywhere in the filename
+#                (case-insensitive unless you add  case_sensitive: true)
+#   by_month:    true/false, overrides month_subfolders for this rule
+#
+# A rule with both `extensions` and `pattern` needs BOTH to match.
+# Keep the specific (pattern) rules above the general (extension) ones.
+# ---------------------------------------------------------------------------
+rules:
+  # --- By filename -------------------------------------------------------
+  - name: Finance
+    pattern: 'invoice|receipt'
+    folder: Documents/Finance
+
+  - name: Uni
+    # Note: "week" also matches e.g. "weekend". Use 'lecture|week ?\d' to be stricter.
+    pattern: 'lecture|week'
+    folder: Uni
+
+  # Example: only PDFs whose name mentions "bank" or "statement"
+  # - name: Bank statements
+  #   pattern: 'bank|statement'
+  #   extensions: [pdf]
+  #   folder: Documents/Finance/Statements
+
+  # --- By file type ------------------------------------------------------
+  - name: Images
+    extensions: [jpg, jpeg, png, gif, bmp, webp, heic, heif, tif, tiff, svg, ico, avif, raw, cr2, nef, arw, dng, psd]
+    folder: Images
+    by_month: true
+
+  - name: Videos
+    extensions: [mp4, mkv, mov, avi, wmv, flv, webm, m4v, mpg, mpeg, 3gp]
+    folder: Videos
+
+  - name: Audio
+    extensions: [mp3, wav, flac, aac, ogg, m4a, wma, opus, aiff, mid, midi]
+    folder: Audio
+
+  - name: Spreadsheets
+    extensions: [xls, xlsx, xlsm, ods, csv, tsv, numbers]
+    folder: Spreadsheets
+
+  - name: Presentations
+    extensions: [ppt, pptx, pps, ppsx, odp, key]
+    folder: Presentations
+
+  - name: Documents
+    extensions: [pdf, doc, docx, odt, rtf, txt, md, epub, tex, pages, xps]
+    folder: Documents
+
+  - name: Archives
+    extensions: [zip, rar, 7z, tar, gz, tgz, bz2, xz, zst, iso, cab]
+    folder: Archives
+
+  - name: Installers
+    extensions: [exe, msi, msix, msixbundle, appx, appxbundle, dmg, pkg, deb, rpm, apk]
+    folder: Installers
+
+  - name: Code
+    extensions: [py, ipynb, js, ts, jsx, tsx, html, css, json, xml, yaml, yml, toml, ini, java, c, cpp, h, hpp, cs, go, rs, rb, php, sh, ps1, bat, cmd, sql, kt, swift, lua, r]
+    folder: Code
+
+  - name: Fonts
+    extensions: [ttf, otf, woff, woff2, fon, eot]
+    folder: Fonts
